@@ -1,3 +1,4 @@
+import React from 'react';
 import type { WeekData, UserRole } from '../types';
 import { 
   Calendar, 
@@ -60,18 +61,15 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const isManagerOrLead = currentUserRole === 'manager' || currentUserRole === 'sricharan' || currentUserRole === 'dhanusri';
 
-  const allTabs: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
+  const allTabs: { id: DashboardTab; label: string; icon: React.ReactNode }[] = isManagerOrLead ? [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
     { id: 'resources', label: 'Resources', icon: <Users className="w-3.5 h-3.5" /> },
     { id: 'reports', label: 'Weekly Reports', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
     { id: 'comparison', label: 'Comparison', icon: <ArrowRightLeft className="w-3.5 h-3.5" /> },
     { id: 'final', label: 'Final Report', icon: <FileText className="w-3.5 h-3.5" /> },
+  ] : [
+    { id: 'reports', label: 'My Weekly Report', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
   ];
-
-  const tabs = allTabs.filter((tab) => {
-    if (tab.id === 'comparison' && !isManagerOrLead) return false;
-    return true;
-  });
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
@@ -90,11 +88,13 @@ export const Header: React.FC<HeaderProps> = ({
                 </h1>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">
                   <Sparkles className="w-3 h-3 mr-1 text-cyan-600" />
-                  Weekly Reporting
+                  {isManagerOrLead ? 'Manager Platform' : 'Resource Portal'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Daily logging, resource utilization tracking & automated manager reports
+                {isManagerOrLead
+                  ? 'Team utilization tracking, ESP campaign metrics & automated manager reports'
+                  : 'Log your daily metrics & weekly campaign activity'}
               </p>
             </div>
           </div>
@@ -138,103 +138,102 @@ export const Header: React.FC<HeaderProps> = ({
               <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 pointer-events-none" />
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={onOpenUploadModal}
-                className="flex items-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold transition-all shadow-md border border-blue-500/20"
-                title="Upload CSV or JSON weekly data file"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload Data</span>
-              </button>
+            {/* Action Buttons (Only visible to Managers & Leads) */}
+            {isManagerOrLead && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={onOpenUploadModal}
+                  className="flex items-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-xs font-bold transition-all shadow-md border border-blue-500/20"
+                  title="Upload CSV or JSON weekly data file"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Upload Data</span>
+                </button>
 
-              <button
-                onClick={onOpenEditModal}
-                disabled={weeks.length === 0}
-                className="flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition-all shadow-sm disabled:opacity-50"
-                title="Edit weekly data & metrics"
-              >
-                <Edit3 className="w-3.5 h-3.5 text-cyan-600" />
-                <span className="hidden sm:inline">Edit Data</span>
-              </button>
+                <button
+                  onClick={onOpenEditModal}
+                  disabled={weeks.length === 0}
+                  className="flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition-all shadow-sm disabled:opacity-50"
+                  title="Edit weekly data & metrics"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-cyan-600" />
+                  <span className="hidden sm:inline">Edit Data</span>
+                </button>
 
-              <button
-                onClick={onOpenAddWeekModal}
-                className="flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition-all shadow-sm"
-                title="Add new week record"
-              >
-                <PlusCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="hidden sm:inline">New Week</span>
-              </button>
+                <button
+                  onClick={onOpenAddWeekModal}
+                  className="flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition-all shadow-sm"
+                  title="Add new week record"
+                >
+                  <PlusCircle className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="hidden sm:inline">New Week</span>
+                </button>
 
-              <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
+                <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
 
-              <button
-                onClick={onExportCSV}
-                disabled={weeks.length === 0}
-                className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl border border-slate-300 transition-all disabled:opacity-50"
-                title="Export Week Data to CSV"
-              >
-                <Download className="w-4 h-4" />
-              </button>
+                <button
+                  onClick={onExportCSV}
+                  disabled={weeks.length === 0}
+                  className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl border border-slate-300 transition-all disabled:opacity-50"
+                  title="Export Week Data to CSV"
+                >
+                  <Download className="w-4 h-4" />
+                </button>
 
-              <button
-                onClick={onPrintReport}
-                disabled={weeks.length === 0}
-                className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl border border-slate-300 transition-all disabled:opacity-50"
-                title="Print Executive Dashboard Report"
-              >
-                <Printer className="w-4 h-4" />
-              </button>
+                <button
+                  onClick={onPrintReport}
+                  disabled={weeks.length === 0}
+                  className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl border border-slate-300 transition-all disabled:opacity-50"
+                  title="Print Executive Dashboard Report"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
 
-              <button
-                onClick={onClearAllData}
-                className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl border border-slate-300 transition-all"
-                title="Clear all weekly data"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+                <button
+                  onClick={onClearAllData}
+                  className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl border border-slate-300 transition-all"
+                  title="Clear all weekly data"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
 
-              <button
-                onClick={onResetData}
-                className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl border border-slate-300 transition-all"
-                title="Reset to demo dataset"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
+                <button
+                  onClick={onResetData}
+                  className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl border border-slate-300 transition-all"
+                  title="Reset to demo dataset"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
-              {/* User Profile Badge & Logout Button */}
-              {currentUserRole && onLogout && (
-                <>
-                  <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
-                  <div className="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
-                    {currentUserRole === 'manager' ? (
-                      <Shield className="w-3.5 h-3.5 text-purple-600" />
-                    ) : (
-                      <UserCheck className="w-3.5 h-3.5 text-cyan-600" />
-                    )}
-                    <span className="text-xs font-bold text-slate-800 capitalize">
-                      {currentUserRole === 'manager' ? 'Manager' : currentUserRole}
-                    </span>
-                    <button
-                      onClick={onLogout}
-                      className="ml-1 text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors"
-                      title="Log out of account"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            {/* User Profile Badge & Logout Button */}
+            {currentUserRole && onLogout && (
+              <div className="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
+                {isManagerOrLead ? (
+                  <Shield className="w-3.5 h-3.5 text-purple-600" />
+                ) : (
+                  <UserCheck className="w-3.5 h-3.5 text-cyan-600" />
+                )}
+                <span className="text-xs font-bold text-slate-800 capitalize">
+                  {currentUserRole === 'manager' ? 'Manager' : currentUserRole}
+                </span>
+                <button
+                  onClick={onLogout}
+                  className="ml-1 text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors"
+                  title="Log out of account"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
           </div>
         </div>
 
         {/* Tab Navigation Row */}
         <div className="mt-4 pt-3 border-t border-slate-200 flex items-center space-x-1.5 overflow-x-auto">
-          {tabs.map((tab) => {
+          {allTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button

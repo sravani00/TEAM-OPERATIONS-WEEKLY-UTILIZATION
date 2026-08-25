@@ -11,13 +11,19 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
   currentRole,
   onSelectRole,
 }) => {
-  const roles: { id: UserRole; name: string; title: string; isManager?: boolean }[] = [
-    { id: 'manager', name: 'Manager / Operations Lead', title: 'Manager (Full Access)', isManager: true },
+  // Only render Role Selector Bar for Managers and Team Leads (Sricharan, Dhanusri)
+  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sricharan' || currentRole === 'dhanusri';
+  if (!isManagerOrLead) {
+    return null;
+  }
+
+  const roles: { id: UserRole; name: string; title: string; isManager?: boolean; isLead?: boolean }[] = [
+    { id: 'manager', name: 'Operations Manager', title: 'Manager (Full Access)', isManager: true },
+    { id: 'sricharan', name: 'Sricharan', title: 'ESP Infrastructure Lead', isLead: true },
+    { id: 'dhanusri', name: 'Dhanusri', title: 'Campaign Operations Manager', isLead: true },
     { id: 'sravani', name: 'Sravani', title: 'Sr. Operations Specialist' },
-    { id: 'sricharan', name: 'Sricharan', title: 'ESP Infrastructure Lead' },
     { id: 'vamsi', name: 'Vamsi', title: 'Campaign Operations Specialist' },
     { id: 'vivek', name: 'Vivek', title: 'Deliverability Analyst' },
-    { id: 'dhanusri', name: 'Dhanusri', title: 'Campaign Operations Manager' },
     { id: 'vishnu', name: 'Vishnu', title: 'QA & Testing Analyst' },
     { id: 'rahul', name: 'Rahul', title: 'Junior Operations Associate' },
   ];
@@ -29,13 +35,13 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         
         <div className="flex items-center space-x-2 text-slate-700 font-semibold">
-          <UserCheck className="w-4 h-4 text-cyan-600" />
-          <span>Select Active User Account / Role:</span>
+          <Shield className="w-4 h-4 text-purple-600" />
+          <span>Management Simulator — Account Switcher:</span>
         </div>
 
-        {/* Clean Dropdown Selector */}
+        {/* Dropdown Selector */}
         <div className="relative flex items-center w-full sm:w-auto">
-          {currentRoleObj.isManager ? (
+          {currentRoleObj.isManager || currentRoleObj.isLead ? (
             <Shield className="w-4 h-4 text-purple-600 absolute left-3 pointer-events-none z-10" />
           ) : (
             <UserCheck className="w-4 h-4 text-cyan-600 absolute left-3 pointer-events-none z-10" />
@@ -44,17 +50,19 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
           <select
             value={currentRole}
             onChange={(e) => onSelectRole(e.target.value as UserRole)}
-            className="w-full sm:w-72 appearance-none bg-white text-slate-900 font-bold pl-9 pr-9 py-2 rounded-xl text-xs border border-slate-300 hover:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-sm cursor-pointer"
+            className="w-full sm:w-72 appearance-none bg-white text-slate-900 font-bold pl-9 pr-9 py-2 rounded-xl text-xs border border-slate-300 hover:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm cursor-pointer"
           >
             <option value="manager" className="font-bold text-purple-700">
-              🛡️ Manager / Operations Lead
+              🛡️ Operations Manager (Full Access)
             </option>
+            <optgroup label="Team Lead Accounts">
+              <option value="sricharan">🛡️ Sricharan (ESP Infrastructure Lead)</option>
+              <option value="dhanusri">🛡️ Dhanusri (Campaign Manager)</option>
+            </optgroup>
             <optgroup label="Team Member Accounts">
               <option value="sravani">👤 Sravani (Sr. Ops Specialist)</option>
-              <option value="sricharan">👤 Sricharan (ESP Lead)</option>
               <option value="vamsi">👤 Vamsi (Ops Specialist)</option>
               <option value="vivek">👤 Vivek (Deliverability Analyst)</option>
-              <option value="dhanusri">👤 Dhanusri (Campaign Manager)</option>
               <option value="vishnu">👤 Vishnu (QA Analyst)</option>
               <option value="rahul">👤 Rahul (Junior Associate)</option>
             </optgroup>
