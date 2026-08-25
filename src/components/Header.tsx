@@ -91,6 +91,9 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-1.5" />
                   Live Sync Active
                 </span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                  💾 Auto-Saved to Storage
+                </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">
                   <Sparkles className="w-3 h-3 mr-1 text-cyan-600" />
                   {isManagerOrLead ? 'Manager Platform' : 'Resource Portal'}
