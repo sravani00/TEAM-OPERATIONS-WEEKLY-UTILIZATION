@@ -11,21 +11,21 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
   currentRole,
   onSelectRole,
 }) => {
-  // Only render Role Selector Bar for Managers and Team Leads (Sricharan, Dhanusri)
-  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sricharan' || currentRole === 'dhanusri';
+  // Only render Role Selector Bar for Managers and Team Leads (Sravani Pinninti, SriCharan Khandesh)
+  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sravani' || currentRole === 'sricharan';
   if (!isManagerOrLead) {
     return null;
   }
 
   const roles: { id: UserRole; name: string; title: string; isManager?: boolean; isLead?: boolean }[] = [
-    { id: 'manager', name: 'Operations Manager', title: 'Manager (Full Access)', isManager: true },
-    { id: 'sricharan', name: 'Sricharan', title: 'ESP Infrastructure Lead', isLead: true },
-    { id: 'dhanusri', name: 'Dhanusri', title: 'Campaign Operations Manager', isLead: true },
-    { id: 'sravani', name: 'Sravani', title: 'Sr. Operations Specialist' },
-    { id: 'vamsi', name: 'Vamsi', title: 'Campaign Operations Specialist' },
-    { id: 'vivek', name: 'Vivek', title: 'Deliverability Analyst' },
-    { id: 'vishnu', name: 'Vishnu', title: 'QA & Testing Analyst' },
-    { id: 'rahul', name: 'Rahul', title: 'Junior Operations Associate' },
+    { id: 'manager', name: 'Operations Manager', title: 'Full Access & Management', isManager: true },
+    { id: 'sravani', name: 'Sravani Pinninti', title: 'Associate Team Lead', isLead: true },
+    { id: 'sricharan', name: 'SriCharan Khandesh', title: 'Campaign Manager', isLead: true },
+    { id: 'vamsi', name: 'Banoth Vamsi', title: 'Associate Campaign Manager' },
+    { id: 'vivek', name: 'Parava Vivekananda Reddy', title: 'Associate Campaign Manager' },
+    { id: 'dhanusri', name: 'Pallepati Dhanusri', title: 'Associate Campaign Manager' },
+    { id: 'vishnu', name: 'Vishnu R Joshi', title: 'Associate Campaign Manager' },
+    { id: 'rahul', name: 'Rahul Kodi', title: 'Associate Campaign Manager' },
   ];
 
   const currentRoleObj = roles.find((r) => r.id === currentRole) || roles[0];
@@ -50,21 +50,21 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
           <select
             value={currentRole}
             onChange={(e) => onSelectRole(e.target.value as UserRole)}
-            className="w-full sm:w-72 appearance-none bg-white text-slate-900 font-bold pl-9 pr-9 py-2 rounded-xl text-xs border border-slate-300 hover:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm cursor-pointer"
+            className="w-full sm:w-80 appearance-none bg-white text-slate-900 font-bold pl-9 pr-9 py-2 rounded-xl text-xs border border-slate-300 hover:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm cursor-pointer"
           >
             <option value="manager" className="font-bold text-purple-700">
               🛡️ Operations Manager (Full Access)
             </option>
             <optgroup label="Team Lead Accounts">
-              <option value="sricharan">🛡️ Sricharan (ESP Infrastructure Lead)</option>
-              <option value="dhanusri">🛡️ Dhanusri (Campaign Manager)</option>
+              <option value="sravani">🛡️ Sravani Pinninti (Associate Team Lead)</option>
+              <option value="sricharan">🛡️ SriCharan Khandesh (Campaign Manager)</option>
             </optgroup>
-            <optgroup label="Team Member Accounts">
-              <option value="sravani">👤 Sravani (Sr. Ops Specialist)</option>
-              <option value="vamsi">👤 Vamsi (Ops Specialist)</option>
-              <option value="vivek">👤 Vivek (Deliverability Analyst)</option>
-              <option value="vishnu">👤 Vishnu (QA Analyst)</option>
-              <option value="rahul">👤 Rahul (Junior Associate)</option>
+            <optgroup label="Associate Campaign Managers">
+              <option value="vamsi">👤 Banoth Vamsi</option>
+              <option value="vivek">👤 Parava Vivekananda Reddy</option>
+              <option value="dhanusri">👤 Pallepati Dhanusri</option>
+              <option value="vishnu">👤 Vishnu R Joshi</option>
+              <option value="rahul">👤 Rahul Kodi</option>
             </optgroup>
           </select>
           <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 pointer-events-none" />

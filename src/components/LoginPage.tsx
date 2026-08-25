@@ -25,13 +25,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   const accounts: { id: UserRole; name: string; title: string; avatar: string; isManager?: boolean; isLead?: boolean }[] = [
     { id: 'manager', name: 'Operations Manager', title: 'Full Access & Management', avatar: 'M', isManager: true },
-    { id: 'sricharan', name: 'Sricharan', title: 'ESP Infrastructure Lead', avatar: 'S', isLead: true },
-    { id: 'dhanusri', name: 'Dhanusri', title: 'Campaign Operations Manager', avatar: 'D', isLead: true },
-    { id: 'sravani', name: 'Sravani', title: 'Sr. Operations Specialist', avatar: 'S' },
-    { id: 'vamsi', name: 'Vamsi', title: 'Campaign Operations Specialist', avatar: 'V' },
-    { id: 'vivek', name: 'Vivek', title: 'Deliverability Analyst', avatar: 'V' },
-    { id: 'vishnu', name: 'Vishnu', title: 'QA & Testing Analyst', avatar: 'V' },
-    { id: 'rahul', name: 'Rahul', title: 'Junior Operations Associate', avatar: 'R' },
+    { id: 'sravani', name: 'Sravani Pinninti', title: 'Associate Team Lead', avatar: 'S', isLead: true },
+    { id: 'sricharan', name: 'SriCharan Khandesh', title: 'Campaign Manager', avatar: 'S', isLead: true },
+    { id: 'vamsi', name: 'Banoth Vamsi', title: 'Associate Campaign Manager', avatar: 'B' },
+    { id: 'vivek', name: 'Parava Vivekananda Reddy', title: 'Associate Campaign Manager', avatar: 'P' },
+    { id: 'dhanusri', name: 'Pallepati Dhanusri', title: 'Associate Campaign Manager', avatar: 'P' },
+    { id: 'vishnu', name: 'Vishnu R Joshi', title: 'Associate Campaign Manager', avatar: 'V' },
+    { id: 'rahul', name: 'Rahul Kodi', title: 'Associate Campaign Manager', avatar: 'R' },
   ];
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -109,7 +109,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 <div>
                   <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-1">
                     <span>{acc.name}</span>
-                    {acc.isLead && <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-1.5 py-0.5 rounded">Lead</span>}
+                    {acc.isLead && <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-1.5 py-0.5 rounded shrink-0">Lead</span>}
                   </h3>
                   <p className="text-[11px] text-slate-500 font-medium leading-snug mt-0.5">{acc.title}</p>
                 </div>

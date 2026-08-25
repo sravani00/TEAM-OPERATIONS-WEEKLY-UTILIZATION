@@ -41,7 +41,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
   onSelectWeek,
   allWeeks,
 }) => {
-  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sricharan' || currentRole === 'dhanusri';
+  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sravani' || currentRole === 'sricharan';
 
   // Find current resource's data record in current week
   const memberRecord: TeamMemberData = currentWeek.teamData.find(

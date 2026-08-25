@@ -33,8 +33,8 @@ export const INITIAL_WEEKS: WeekData[] = [
     teamData: [
       {
         id: 'tm-sravani',
-        name: 'Sravani',
-        role: 'Sr. Operations Specialist',
+        name: 'Sravani Pinninti',
+        role: 'Associate Team Lead',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,
@@ -54,8 +54,8 @@ export const INITIAL_WEEKS: WeekData[] = [
       },
       {
         id: 'tm-sricharan',
-        name: 'Sricharan',
-        role: 'ESP Infrastructure Lead',
+        name: 'SriCharan Khandesh',
+        role: 'Campaign Manager',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,
@@ -75,8 +75,8 @@ export const INITIAL_WEEKS: WeekData[] = [
       },
       {
         id: 'tm-vamsi',
-        name: 'Vamsi',
-        role: 'Campaign Operations Specialist',
+        name: 'Banoth Vamsi',
+        role: 'Associate Campaign Manager',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,
@@ -96,8 +96,8 @@ export const INITIAL_WEEKS: WeekData[] = [
       },
       {
         id: 'tm-vivek',
-        name: 'Vivek',
-        role: 'Deliverability Analyst',
+        name: 'Parava Vivekananda Reddy',
+        role: 'Associate Campaign Manager',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,
@@ -117,8 +117,8 @@ export const INITIAL_WEEKS: WeekData[] = [
       },
       {
         id: 'tm-dhanusri',
-        name: 'Dhanusri',
-        role: 'Campaign Operations Manager',
+        name: 'Pallepati Dhanusri',
+        role: 'Associate Campaign Manager',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,
@@ -138,8 +138,8 @@ export const INITIAL_WEEKS: WeekData[] = [
       },
       {
         id: 'tm-vishnu',
-        name: 'Vishnu',
-        role: 'QA & Testing Analyst',
+        name: 'Vishnu R Joshi',
+        role: 'Associate Campaign Manager',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,
@@ -159,8 +159,8 @@ export const INITIAL_WEEKS: WeekData[] = [
       },
       {
         id: 'tm-rahul',
-        name: 'Rahul',
-        role: 'Junior Operations Associate',
+        name: 'Rahul Kodi',
+        role: 'Associate Campaign Manager',
         campaigns: 0,
         hours: 0,
         avgHoursPerDay: 0,

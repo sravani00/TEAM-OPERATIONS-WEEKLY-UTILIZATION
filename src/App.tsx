@@ -17,7 +17,7 @@ import { AddWeekModal } from './components/AddWeekModal';
 import { UploadWeekModal } from './components/UploadWeekModal';
 import { LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v9';
+const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v10';
 const AUTH_KEY = 'weekly_ops_dashboard_auth_v9';
 
 const EMPTY_WEEK: WeekData = {
@@ -303,14 +303,14 @@ export const App: React.FC = () => {
 
   // Human Readable Name mapping for roles
   const roleNameMap: Record<UserRole, string> = {
-    manager: 'Manager',
-    sravani: 'Sravani',
-    sricharan: 'Sricharan',
-    vamsi: 'Vamsi',
-    vivek: 'Vivek',
-    dhanusri: 'Dhanusri',
-    vishnu: 'Vishnu',
-    rahul: 'Rahul',
+    manager: 'Operations Manager',
+    sravani: 'Sravani Pinninti',
+    sricharan: 'SriCharan Khandesh',
+    vamsi: 'Banoth Vamsi',
+    vivek: 'Parava Vivekananda Reddy',
+    dhanusri: 'Pallepati Dhanusri',
+    vishnu: 'Vishnu R Joshi',
+    rahul: 'Rahul Kodi',
   };
 
   // If unauthenticated, render Login Page
