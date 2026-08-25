@@ -58,13 +58,20 @@ export const Header: React.FC<HeaderProps> = ({
   onResetData,
   onClearAllData,
 }) => {
-  const tabs: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
+  const isManagerOrLead = currentUserRole === 'manager' || currentUserRole === 'sricharan' || currentUserRole === 'dhanusri';
+
+  const allTabs: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
     { id: 'resources', label: 'Resources', icon: <Users className="w-3.5 h-3.5" /> },
     { id: 'reports', label: 'Weekly Reports', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
     { id: 'comparison', label: 'Comparison', icon: <ArrowRightLeft className="w-3.5 h-3.5" /> },
     { id: 'final', label: 'Final Report', icon: <FileText className="w-3.5 h-3.5" /> },
   ];
+
+  const tabs = allTabs.filter((tab) => {
+    if (tab.id === 'comparison' && !isManagerOrLead) return false;
+    return true;
+  });
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">

@@ -389,6 +389,7 @@ export const App: React.FC = () => {
                 key={`${currentWeek.id}-${currentUserRole}`}
                 currentWeek={currentWeek}
                 resourceName={roleNameMap[currentUserRole]}
+                currentRole={currentUserRole}
                 onSaveReport={handleSaveWeek}
                 onSelectWeek={setSelectedWeekId}
                 allWeeks={weeks}

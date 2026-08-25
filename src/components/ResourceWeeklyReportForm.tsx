@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { WeekData, TeamMemberData, ESPBreakdownItem, DailyLogEntry } from '../types';
+import type { WeekData, TeamMemberData, ESPBreakdownItem, DailyLogEntry, UserRole } from '../types';
 import { 
   Send, 
   Save, 
@@ -19,6 +19,7 @@ import {
 interface ResourceWeeklyReportFormProps {
   currentWeek: WeekData;
   resourceName: string;
+  currentRole?: UserRole;
   onSaveReport: (updatedWeek: WeekData) => void;
   onSelectWeek: (weekId: string) => void;
   allWeeks: WeekData[];
@@ -35,10 +36,13 @@ const defaultDailyTemplate: DailyLogEntry[] = [
 export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> = ({
   currentWeek,
   resourceName,
+  currentRole,
   onSaveReport,
   onSelectWeek,
   allWeeks,
 }) => {
+  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sricharan' || currentRole === 'dhanusri';
+
   // Find current resource's data record in current week
   const memberRecord: TeamMemberData = currentWeek.teamData.find(
     (t) => t.name.toLowerCase() === resourceName.toLowerCase()
@@ -336,7 +340,8 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
               <Server className="w-4 h-4 text-cyan-600" />
               <h3>ESP-wise Campaign Utilization</h3>
             </div>
-            {!isLocked && (
+            {/* Show Add ESP button ONLY for Managers and Team Leads */}
+            {!isLocked && isManagerOrLead && (
               <button
                 type="button"
                 onClick={handleAddESP}
@@ -355,7 +360,8 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
                   <th className="py-3 px-4">ESP Platform</th>
                   <th className="py-3 px-4 text-right">Campaigns Completed</th>
                   <th className="py-3 px-4 text-right">Utilization % (Auto)</th>
-                  {!isLocked && <th className="py-3 px-4 text-center">Action</th>}
+                  {/* Show Action Column ONLY for Managers and Team Leads */}
+                  {!isLocked && isManagerOrLead && <th className="py-3 px-4 text-center">Action</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 bg-white">
@@ -363,8 +369,8 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
                   const calculatedUtil = item.utilization || Math.min(100, Math.round((dailyUtilization * (0.96 + (item.campaigns % 5) * 0.01)) * 10) / 10);
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/80">
-                      <td className="py-2.5 px-4">
-                        {isLocked ? (
+                      <td className="py-2.5 px-4 font-bold text-slate-900">
+                        {isLocked || !isManagerOrLead ? (
                           <span className="font-bold text-slate-900">{item.esp}</span>
                         ) : (
                           <input
@@ -383,7 +389,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
                             type="number"
                             value={item.campaigns}
                             onChange={(e) => handleESPChange(item.id, 'campaigns', parseFloat(e.target.value) || 0)}
-                            className="bg-slate-50 text-emerald-700 font-extrabold px-3 py-1.5 rounded-lg border border-slate-300 w-24 text-right focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                            className="bg-slate-50 text-emerald-700 font-extrabold px-3 py-1.5 rounded-lg border border-slate-300 w-24 text-right focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-sm"
                           />
                         )}
                       </td>
@@ -392,7 +398,8 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
                           {calculatedUtil}%
                         </span>
                       </td>
-                      {!isLocked && (
+                      {/* Show Delete Action Trashcan ONLY for Managers and Team Leads */}
+                      {!isLocked && isManagerOrLead && (
                         <td className="py-2.5 px-4 text-center">
                           <button
                             type="button"
@@ -412,7 +419,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
                   <td className="py-3 px-4">Total</td>
                   <td className="py-3 px-4 text-right text-emerald-700 font-black text-sm">{totalCampaigns}</td>
                   <td className="py-3 px-4 text-right text-blue-700 font-black text-sm">{overallUtilization}%</td>
-                  {!isLocked && <td className="py-3 px-4" />}
+                  {!isLocked && isManagerOrLead && <td className="py-3 px-4" />}
                 </tr>
               </tbody>
             </table>
