@@ -87,6 +87,10 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className="text-xl font-black text-slate-900 tracking-tight">
                   TEAM OPERATIONS – WEEKLY UTILIZATION
                 </h1>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-1.5" />
+                  Live Sync Active
+                </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">
                   <Sparkles className="w-3 h-3 mr-1 text-cyan-600" />
                   {isManagerOrLead ? 'Manager Platform' : 'Resource Portal'}

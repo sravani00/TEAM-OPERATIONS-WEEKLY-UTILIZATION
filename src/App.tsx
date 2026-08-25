@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { INITIAL_WEEKS } from './data/mockData';
 import type { WeekData, UserRole, DailyLogEntry } from './types';
 import { Header, type DashboardTab } from './components/Header';
@@ -18,8 +18,9 @@ import { UploadWeekModal } from './components/UploadWeekModal';
 import { DateRangePickerModal } from './components/DateRangePickerModal';
 import { LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v11';
+const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v12';
 const AUTH_KEY = 'weekly_ops_dashboard_auth_v9';
+const BROADCAST_CHANNEL_NAME = 'weekly_ops_realtime_sync_channel';
 
 const EMPTY_WEEK: WeekData = {
   id: 'empty-week',
@@ -103,10 +104,53 @@ export const App: React.FC = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isDateRangeModalOpen, setIsDateRangeModalOpen] = useState(false);
 
-  // Save weeks to localStorage whenever modified
+  // Broadcast Channel Reference for Real-Time Cross-Window Synchronization
+  const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
+
+  // Initialize BroadcastChannel and Storage Listener for REAL-TIME LIVE SYNC
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(weeks));
-  }, [weeks]);
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      const channel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+      broadcastChannelRef.current = channel;
+
+      channel.onmessage = (event) => {
+        if (event.data && Array.isArray(event.data.weeks)) {
+          setWeeks(event.data.weeks);
+        }
+      };
+    }
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setWeeks(parsed);
+          }
+        } catch (err) {
+          console.error('Storage sync error', err);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      if (broadcastChannelRef.current) {
+        broadcastChannelRef.current.close();
+      }
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // Save weeks to localStorage & broadcast to other tabs whenever modified
+  const saveAndBroadcastWeeks = (updatedWeeks: WeekData[]) => {
+    setWeeks(updatedWeeks);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedWeeks));
+    if (broadcastChannelRef.current) {
+      broadcastChannelRef.current.postMessage({ weeks: updatedWeeks, timestamp: Date.now() });
+    }
+  };
 
   // Handle Login & Logout
   const handleLogin = (role: UserRole) => {
@@ -151,7 +195,7 @@ export const App: React.FC = () => {
       teamData: updatedTeamData,
     };
 
-    setWeeks((prev) => [newWeek, ...prev]);
+    saveAndBroadcastWeeks([newWeek, ...weeks]);
     setSelectedWeekId(newWeekId);
   };
 
@@ -170,14 +214,13 @@ export const App: React.FC = () => {
     if (existingWeek) {
       setSelectedWeekId(existingWeek.id);
     } else {
-      // Create new week dataset for the selected calendar date range
       const newWeek: WeekData = {
         ...INITIAL_WEEKS[0],
         id: weekId,
         dateRange,
         previousWeekRange: currentWeek.dateRange,
       };
-      setWeeks((prev) => [newWeek, ...prev]);
+      saveAndBroadcastWeeks([newWeek, ...weeks]);
       setSelectedWeekId(newWeek.id);
     }
   };
@@ -216,7 +259,7 @@ export const App: React.FC = () => {
     return true;
   });
 
-  // Handlers for Data Mutations with REAL-TIME AUTOMATIC TEAM RECALCULATION
+  // Handlers for Data Mutations with REAL-TIME AUTOMATIC TEAM RECALCULATION & BROADCAST
   const handleSaveWeek = (updatedWeek: WeekData) => {
     const teamData = updatedWeek.teamData || [];
     
@@ -241,21 +284,22 @@ export const App: React.FC = () => {
       },
     };
 
-    setWeeks((prev) => prev.map((w) => (w.id === recalculatedWeek.id ? recalculatedWeek : w)));
+    const updatedWeeks = weeks.map((w) => (w.id === recalculatedWeek.id ? recalculatedWeek : w));
+    saveAndBroadcastWeeks(updatedWeeks);
   };
 
   const handleAddWeek = (newWeek: WeekData) => {
-    setWeeks((prev) => {
-      const existingIdx = prev.findIndex(
-        (w) => w.id === newWeek.id || w.dateRange.trim().toLowerCase() === newWeek.dateRange.trim().toLowerCase()
-      );
-      if (existingIdx >= 0) {
-        const copy = [...prev];
-        copy[existingIdx] = newWeek;
-        return copy;
-      }
-      return [newWeek, ...prev];
-    });
+    const existingIdx = weeks.findIndex(
+      (w) => w.id === newWeek.id || w.dateRange.trim().toLowerCase() === newWeek.dateRange.trim().toLowerCase()
+    );
+    let nextWeeks: WeekData[];
+    if (existingIdx >= 0) {
+      nextWeeks = [...weeks];
+      nextWeeks[existingIdx] = newWeek;
+    } else {
+      nextWeeks = [newWeek, ...weeks];
+    }
+    saveAndBroadcastWeeks(nextWeeks);
     setSelectedWeekId(newWeek.id);
     setEspFilter('ALL');
     setTeamFilter('ALL');
@@ -265,7 +309,7 @@ export const App: React.FC = () => {
   const handleResetData = () => {
     if (window.confirm('Are you sure you want to reset to default operational dataset?')) {
       localStorage.removeItem(STORAGE_KEY);
-      setWeeks(INITIAL_WEEKS);
+      saveAndBroadcastWeeks(INITIAL_WEEKS);
       setSelectedWeekId(INITIAL_WEEKS[0].id);
       setEspFilter('ALL');
       setTeamFilter('ALL');
@@ -275,8 +319,7 @@ export const App: React.FC = () => {
 
   const handleClearAllData = () => {
     if (window.confirm('Are you sure you want to clear all operational data?')) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      setWeeks([]);
+      saveAndBroadcastWeeks([]);
       setSelectedWeekId('');
       setEspFilter('ALL');
       setTeamFilter('ALL');

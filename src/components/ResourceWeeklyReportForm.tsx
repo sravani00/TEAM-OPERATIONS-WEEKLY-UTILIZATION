@@ -172,6 +172,24 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
     onSaveReport(updatedWeek);
   };
 
+  // Live Auto-Sync to Manager/Lead Dashboard whenever form state changes
+  const isFirstRender = React.useRef(true);
+  React.useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (isLocked) return;
+
+    const timer = setTimeout(() => {
+      const targetStatus: 'Draft' | 'Submitted' = memberRecord.status === 'Submitted' ? 'Submitted' : 'Draft';
+      handleSave(targetStatus);
+    }, 400);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dailyLogs, espBreakdown, description, keyActivities, thisWeekPlan, isLocked, memberRecord.status]);
+
   return (
     <div className="space-y-6">
 
