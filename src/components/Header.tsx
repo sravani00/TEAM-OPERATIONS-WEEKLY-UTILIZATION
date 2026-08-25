@@ -1,5 +1,4 @@
-import React from 'react';
-import type { WeekData } from '../types';
+import type { WeekData, UserRole } from '../types';
 import { 
   Calendar, 
   BarChart3, 
@@ -16,7 +15,10 @@ import {
   Users,
   FileSpreadsheet,
   ArrowRightLeft,
-  FileText
+  FileText,
+  LogOut,
+  UserCheck,
+  Shield
 } from 'lucide-react';
 
 export type DashboardTab = 'dashboard' | 'resources' | 'reports' | 'comparison' | 'final';
@@ -28,6 +30,8 @@ interface HeaderProps {
   onSelectCalendarDate: (dateStr: string) => void;
   activeTab: DashboardTab;
   onSelectTab: (tab: DashboardTab) => void;
+  currentUserRole?: UserRole | null;
+  onLogout?: () => void;
   onOpenEditModal: () => void;
   onOpenAddWeekModal: () => void;
   onOpenUploadModal: () => void;
@@ -44,6 +48,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectCalendarDate,
   activeTab,
   onSelectTab,
+  currentUserRole,
+  onLogout,
   onOpenEditModal,
   onOpenAddWeekModal,
   onOpenUploadModal,
@@ -190,6 +196,30 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
+
+              {/* User Profile Badge & Logout Button */}
+              {currentUserRole && onLogout && (
+                <>
+                  <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
+                  <div className="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
+                    {currentUserRole === 'manager' ? (
+                      <Shield className="w-3.5 h-3.5 text-purple-600" />
+                    ) : (
+                      <UserCheck className="w-3.5 h-3.5 text-cyan-600" />
+                    )}
+                    <span className="text-xs font-bold text-slate-800 capitalize">
+                      {currentUserRole === 'manager' ? 'Manager' : currentUserRole}
+                    </span>
+                    <button
+                      onClick={onLogout}
+                      className="ml-1 text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors"
+                      title="Log out of account"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
           </div>

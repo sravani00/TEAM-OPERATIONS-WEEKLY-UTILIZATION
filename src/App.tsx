@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { INITIAL_WEEKS } from './data/mockData';
 import type { WeekData, UserRole } from './types';
 import { Header, type DashboardTab } from './components/Header';
+import { LoginPage } from './components/LoginPage';
 import { RoleSelectorBar } from './components/RoleSelectorBar';
 import { ResourceWeeklyReportForm } from './components/ResourceWeeklyReportForm';
 import { ManagerDashboardView } from './components/ManagerDashboardView';
@@ -16,7 +17,8 @@ import { AddWeekModal } from './components/AddWeekModal';
 import { UploadWeekModal } from './components/UploadWeekModal';
 import { LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v8';
+const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v9';
+const AUTH_KEY = 'weekly_ops_dashboard_auth_v9';
 
 const EMPTY_WEEK: WeekData = {
   id: 'empty-week',
@@ -61,6 +63,17 @@ function getWeekRangeFromDate(dateInput: Date): { dateRange: string; weekId: str
 }
 
 export const App: React.FC = () => {
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    const savedAuth = localStorage.getItem(AUTH_KEY);
+    return savedAuth !== null;
+  });
+
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(() => {
+    const savedAuth = localStorage.getItem(AUTH_KEY);
+    return (savedAuth as UserRole) || null;
+  });
+
   // Persistence state
   const [weeks, setWeeks] = useState<WeekData[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -76,7 +89,6 @@ export const App: React.FC = () => {
   });
 
   const [selectedWeekId, setSelectedWeekId] = useState<string>(() => weeks[0]?.id || INITIAL_WEEKS[0].id);
-  const [currentRole, setCurrentRole] = useState<UserRole>('sravani');
   const [activeTab, setActiveTab] = useState<DashboardTab>('reports');
 
   // Scope Filters State
@@ -93,6 +105,24 @@ export const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(weeks));
   }, [weeks]);
+
+  // Handle Login & Logout
+  const handleLogin = (role: UserRole) => {
+    setCurrentUserRole(role);
+    setIsAuthenticated(true);
+    localStorage.setItem(AUTH_KEY, role);
+    if (role === 'manager') {
+      setActiveTab('dashboard');
+    } else {
+      setActiveTab('reports');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUserRole(null);
+    localStorage.removeItem(AUTH_KEY);
+  };
 
   // Selected week dataset
   const currentWeek = weeks.find((w) => w.id === selectedWeekId) || weeks[0] || EMPTY_WEEK;
@@ -283,19 +313,19 @@ export const App: React.FC = () => {
     rahul: 'Rahul',
   };
 
+  // If unauthenticated, render Login Page
+  if (!isAuthenticated || !currentUserRole) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       
       {/* Dropdown Role Simulator Bar */}
       <RoleSelectorBar
-        currentRole={currentRole}
+        currentRole={currentUserRole}
         onSelectRole={(role) => {
-          setCurrentRole(role);
-          if (role !== 'manager') {
-            setActiveTab('reports');
-          } else {
-            setActiveTab('dashboard');
-          }
+          handleLogin(role);
         }}
       />
 
@@ -311,6 +341,8 @@ export const App: React.FC = () => {
         onSelectCalendarDate={handleSelectCalendarDate}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
+        currentUserRole={currentUserRole}
+        onLogout={handleLogout}
         onOpenEditModal={() => setIsEditModalOpen(true)}
         onOpenAddWeekModal={() => setIsAddWeekModalOpen(true)}
         onOpenUploadModal={() => setIsUploadModalOpen(true)}
@@ -352,10 +384,11 @@ export const App: React.FC = () => {
         ) : (
           <>
             {/* ROLE VIEW 1: Individual Resource View (Sravani, Sricharan, Vamsi, etc.) */}
-            {currentRole !== 'manager' && (
+            {currentUserRole !== 'manager' && (
               <ResourceWeeklyReportForm
+                key={`${currentWeek.id}-${currentUserRole}`}
                 currentWeek={currentWeek}
-                resourceName={roleNameMap[currentRole]}
+                resourceName={roleNameMap[currentUserRole]}
                 onSaveReport={handleSaveWeek}
                 onSelectWeek={setSelectedWeekId}
                 allWeeks={weeks}
@@ -363,7 +396,7 @@ export const App: React.FC = () => {
             )}
 
             {/* ROLE VIEW 2: Manager Overview (Alex) */}
-            {currentRole === 'manager' && (
+            {currentUserRole === 'manager' && (
               <>
                 {/* TAB 1: Dashboard */}
                 {activeTab === 'dashboard' && (
