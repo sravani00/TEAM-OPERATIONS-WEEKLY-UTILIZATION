@@ -57,7 +57,6 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
       { id: '1', esp: 'Ongage', campaigns: 0, utilization: 0 },
       { id: '2', esp: 'Netcore', campaigns: 0, utilization: 0 },
       { id: '3', esp: 'Maropost', campaigns: 0, utilization: 0 },
-      { id: '4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
     ],
     dailyLogs: defaultDailyTemplate,
     description: '',

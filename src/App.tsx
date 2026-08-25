@@ -16,7 +16,7 @@ import { AddWeekModal } from './components/AddWeekModal';
 import { UploadWeekModal } from './components/UploadWeekModal';
 import { LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v7';
+const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v8';
 
 const EMPTY_WEEK: WeekData = {
   id: 'empty-week',
@@ -429,7 +429,7 @@ export const App: React.FC = () => {
             <LayoutDashboard className="w-4 h-4 text-cyan-600" />
             <span className="font-semibold text-slate-700">Team Operations — Weekly Resource Utilization & Manager Platform</span>
           </div>
-          <p>© 2026 Operations Management Platform. Built for Ongage, Netcore, Maropost, ValueFirst tracking.</p>
+          <p>© 2026 Operations Management Platform. Built for Ongage, Netcore, Maropost tracking.</p>
         </div>
       </footer>
 

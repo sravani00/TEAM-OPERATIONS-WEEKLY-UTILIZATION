@@ -25,7 +25,7 @@ export const ESPSection: React.FC<ESPSectionProps> = ({ espData }) => {
               <span>ESP Platform Capacity & Utilization</span>
             </h2>
             <p className="text-xs text-slate-500">
-              Ongage, Netcore, Maropost, ValueFirst workload metrics
+              Ongage, Netcore, Maropost workload metrics
             </p>
           </div>
         </div>

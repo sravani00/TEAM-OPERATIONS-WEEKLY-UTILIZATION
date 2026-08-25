@@ -35,7 +35,6 @@ Name,Campaigns,Hours
 Ongage,450,36.0
 Netcore,325,29.5
 Maropost,95,13.0
-ValueFirst,135,16.5
 
 # TEAM_MEMBERS
 Name,Role,Campaigns,Hours
@@ -58,7 +57,6 @@ Suppression list auto-cleaner update,Rajesh,In Progress,60,Quality Assurance
 Activity,Owner,Priority,TargetDate,Status
 Complete upcoming holiday campaign queue,Team,High,Sep 04,In Progress
 Q3 deliverability & domain warming audit,Rajesh,Medium,Sep 10,Planned
-ESP load balancing setup across IP pools,Sricharan,High,Sep 08,Planned
 `;
 }
 
@@ -89,7 +87,6 @@ export function generateSampleJSON(previousWeek?: WeekData): string {
       { id: 'esp-1', name: 'Ongage', campaigns: 420, hours: 58.5, utilization: 95.0, previousWeekUtilization: 91.2 },
       { id: 'esp-2', name: 'Netcore', campaigns: 385, hours: 54.0, utilization: 98.0, previousWeekUtilization: 94.5 },
       { id: 'esp-3', name: 'Maropost', campaigns: 180, hours: 28.0, utilization: 92.0, previousWeekUtilization: 88.0 },
-      { id: 'esp-4', name: 'ValueFirst', campaigns: 260, hours: 46.0, utilization: 96.0, previousWeekUtilization: 92.5 },
     ],
     teamData: [
       {
@@ -107,7 +104,6 @@ export function generateSampleJSON(previousWeek?: WeekData): string {
           { id: 'sb-1', esp: 'Ongage', campaigns: 120, utilization: 95.0 },
           { id: 'sb-2', esp: 'Netcore', campaigns: 85, utilization: 98.0 },
           { id: 'sb-3', esp: 'Maropost', campaigns: 25, utilization: 92.0 },
-          { id: 'sb-4', esp: 'ValueFirst', campaigns: 40, utilization: 96.0 },
         ],
         description: 'Campaign scheduling, QA, ESP rotation and monitoring.',
         keyActivities: ['Campaign scheduling', 'ESP utilization monitoring', 'Domain monitoring'],
@@ -164,7 +160,7 @@ export function parseWeeklyCSV(csvText: string, previousWeek?: WeekData): WeekDa
 
   let currentSection: 'METADATA' | 'ESP_PLATFORMS' | 'TEAM_MEMBERS' | 'ACTIVITIES' | 'ACTION_PLAN' = 'METADATA';
 
-  const knownESPs = ['ongage', 'netcore', 'maropost', 'valuefirst', 'mailkit', 'sendgrid', 'mailchimp', 'klaviyo', 'activecampaign', 'brevo', 'hubspot'];
+  const knownESPs = ['ongage', 'netcore', 'maropost', 'mailkit', 'sendgrid', 'mailchimp', 'klaviyo', 'activecampaign', 'brevo', 'hubspot'];
   const knownTeam = ['sravani', 'dhanusri', 'sricharan', 'rajesh', 'ananya', 'vikram', 'john', 'sarah', 'alex', 'mike', 'emily'];
 
   lines.forEach((line) => {
@@ -268,10 +264,9 @@ export function parseWeeklyCSV(csvText: string, previousWeek?: WeekData): WeekDa
           previousWeekUtilization,
           status: 'Submitted',
           espBreakdown: [
-            { id: `eb-1`, esp: 'Ongage', campaigns: Math.round(campaigns * 0.45), utilization },
+            { id: `eb-1`, esp: 'Ongage', campaigns: Math.round(campaigns * 0.50), utilization },
             { id: `eb-2`, esp: 'Netcore', campaigns: Math.round(campaigns * 0.35), utilization },
-            { id: `eb-3`, esp: 'Maropost', campaigns: Math.round(campaigns * 0.10), utilization },
-            { id: `eb-4`, esp: 'ValueFirst', campaigns: Math.round(campaigns * 0.10), utilization },
+            { id: `eb-3`, esp: 'Maropost', campaigns: Math.round(campaigns * 0.15), utilization },
           ],
           description: `${name}'s weekly operational execution, campaign scheduling and ESP monitoring.`,
           keyActivities: ['Campaign scheduling', 'ESP utilization monitoring', 'QA testing'],
@@ -332,7 +327,6 @@ export function parseWeeklyCSV(csvText: string, previousWeek?: WeekData): WeekDa
       { id: 'esp-1', name: 'Ongage', campaigns: 420, hours: 58.5, utilization: 95.0, previousWeekUtilization: 91.2 },
       { id: 'esp-2', name: 'Netcore', campaigns: 385, hours: 54.0, utilization: 98.0, previousWeekUtilization: 94.5 },
       { id: 'esp-3', name: 'Maropost', campaigns: 180, hours: 28.0, utilization: 92.0, previousWeekUtilization: 88.0 },
-      { id: 'esp-4', name: 'ValueFirst', campaigns: 260, hours: 46.0, utilization: 96.0, previousWeekUtilization: 92.5 },
     ];
     espData.push(...defaultList.map((e) => ({ ...e, id: `esp-${Date.now()}-${e.name}` })));
   }
@@ -355,7 +349,6 @@ export function parseWeeklyCSV(csvText: string, previousWeek?: WeekData): WeekDa
           { id: '1', esp: 'Ongage', campaigns: 120, utilization: 95.0 },
           { id: '2', esp: 'Netcore', campaigns: 85, utilization: 98.0 },
           { id: '3', esp: 'Maropost', campaigns: 25, utilization: 92.0 },
-          { id: '4', esp: 'ValueFirst', campaigns: 40, utilization: 96.0 },
         ],
         description: 'Campaign scheduling, QA, ESP rotation and monitoring.',
         keyActivities: ['Campaign scheduling', 'ESP utilization monitoring', 'Domain monitoring'],
