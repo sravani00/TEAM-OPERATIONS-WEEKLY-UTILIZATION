@@ -26,7 +26,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const accounts: { id: UserRole; name: string; title: string; avatar: string; isManager?: boolean; isLead?: boolean }[] = [
     { id: 'manager', name: 'Operations Manager', title: 'Full Access & Management', avatar: 'M', isManager: true },
     { id: 'sravani', name: 'Sravani Pinninti', title: 'Associate Team Lead', avatar: 'S', isLead: true },
-    { id: 'sricharan', name: 'SriCharan Khandesh', title: 'Campaign Manager', avatar: 'S', isLead: true },
+    { id: 'sricharan', name: 'SriCharan Khandesh', title: 'Campaign Manager', avatar: 'S' },
     { id: 'vamsi', name: 'Banoth Vamsi', title: 'Associate Campaign Manager', avatar: 'B' },
     { id: 'vivek', name: 'Parava Vivekananda Reddy', title: 'Associate Campaign Manager', avatar: 'P' },
     { id: 'dhanusri', name: 'Pallepati Dhanusri', title: 'Associate Campaign Manager', avatar: 'P' },

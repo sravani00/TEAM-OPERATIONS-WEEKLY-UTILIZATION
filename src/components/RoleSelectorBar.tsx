@@ -11,8 +11,8 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
   currentRole,
   onSelectRole,
 }) => {
-  // Only render Role Selector Bar for Managers and Team Leads (Sravani Pinninti, SriCharan Khandesh)
-  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sravani' || currentRole === 'sricharan';
+  // Only render Role Selector Bar for Managers and Team Leads (Sravani Pinninti)
+  const isManagerOrLead = currentRole === 'manager' || currentRole === 'sravani';
   if (!isManagerOrLead) {
     return null;
   }
@@ -20,7 +20,7 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
   const roles: { id: UserRole; name: string; title: string; isManager?: boolean; isLead?: boolean }[] = [
     { id: 'manager', name: 'Operations Manager', title: 'Full Access & Management', isManager: true },
     { id: 'sravani', name: 'Sravani Pinninti', title: 'Associate Team Lead', isLead: true },
-    { id: 'sricharan', name: 'SriCharan Khandesh', title: 'Campaign Manager', isLead: true },
+    { id: 'sricharan', name: 'SriCharan Khandesh', title: 'Campaign Manager' },
     { id: 'vamsi', name: 'Banoth Vamsi', title: 'Associate Campaign Manager' },
     { id: 'vivek', name: 'Parava Vivekananda Reddy', title: 'Associate Campaign Manager' },
     { id: 'dhanusri', name: 'Pallepati Dhanusri', title: 'Associate Campaign Manager' },
@@ -57,9 +57,9 @@ export const RoleSelectorBar: React.FC<RoleSelectorBarProps> = ({
             </option>
             <optgroup label="Team Lead Accounts">
               <option value="sravani">🛡️ Sravani Pinninti (Associate Team Lead)</option>
-              <option value="sricharan">🛡️ SriCharan Khandesh (Campaign Manager)</option>
             </optgroup>
-            <optgroup label="Associate Campaign Managers">
+            <optgroup label="Team Roster Accounts">
+              <option value="sricharan">👤 SriCharan Khandesh (Campaign Manager)</option>
               <option value="vamsi">👤 Banoth Vamsi</option>
               <option value="vivek">👤 Parava Vivekananda Reddy</option>
               <option value="dhanusri">👤 Pallepati Dhanusri</option>

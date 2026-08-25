@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   onResetData,
   onClearAllData,
 }) => {
-  const isManagerOrLead = currentUserRole === 'manager' || currentUserRole === 'sravani' || currentUserRole === 'sricharan';
+  const isManagerOrLead = currentUserRole === 'manager' || currentUserRole === 'sravani';
 
   const allTabs: { id: DashboardTab; label: string; icon: React.ReactNode }[] = isManagerOrLead ? [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
