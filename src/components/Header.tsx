@@ -29,6 +29,7 @@ interface HeaderProps {
   selectedWeekId: string;
   onSelectWeek: (id: string) => void;
   onSelectCalendarDate: (dateStr: string) => void;
+  onOpenDateRangeModal: () => void;
   activeTab: DashboardTab;
   onSelectTab: (tab: DashboardTab) => void;
   currentUserRole?: UserRole | null;
@@ -46,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
   weeks,
   selectedWeekId,
   onSelectWeek,
-  onSelectCalendarDate,
+  onOpenDateRangeModal,
   activeTab,
   onSelectTab,
   currentUserRole,
@@ -102,20 +103,15 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Controls & Actions */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             
-            {/* Calendar Date Picker Week Filter */}
-            <div className="relative flex items-center">
-              <Calendar className="w-4 h-4 text-cyan-600 absolute left-3 pointer-events-none z-10" />
-              <input
-                type="date"
-                title="Select a date on calendar to filter week"
-                onChange={(e) => {
-                  if (e.target.value) {
-                    onSelectCalendarDate(e.target.value);
-                  }
-                }}
-                className="bg-slate-50 text-slate-900 font-bold pl-9 pr-3 py-2 rounded-xl text-xs border border-slate-300 hover:border-cyan-500 focus:outline-none cursor-pointer shadow-sm"
-              />
-            </div>
+            {/* Custom Date Range & Duration Selector Pill */}
+            <button
+              onClick={onOpenDateRangeModal}
+              className="flex items-center space-x-2 bg-cyan-50 text-cyan-800 font-extrabold px-3.5 py-2 rounded-xl text-xs border border-cyan-300 hover:border-cyan-500 hover:bg-cyan-100 transition-all shadow-sm cursor-pointer"
+              title="Click to select 7, 10, 15, 30 days or custom date range"
+            >
+              <Calendar className="w-4 h-4 text-cyan-600" />
+              <span>Select Date Range (7d, 10d, 15d, 30d...)</span>
+            </button>
 
             {/* Week Selector Dropdown */}
             <div className="relative flex items-center">

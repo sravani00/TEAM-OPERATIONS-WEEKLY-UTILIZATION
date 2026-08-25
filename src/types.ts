@@ -19,7 +19,7 @@ export interface ESPData {
 }
 
 export interface DailyLogEntry {
-  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
+  day: string;
   dateStr?: string;
   campaigns: number;
   hours: number;

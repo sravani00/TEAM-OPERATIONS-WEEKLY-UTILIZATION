@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { INITIAL_WEEKS } from './data/mockData';
-import type { WeekData, UserRole } from './types';
+import type { WeekData, UserRole, DailyLogEntry } from './types';
 import { Header, type DashboardTab } from './components/Header';
 import { LoginPage } from './components/LoginPage';
 import { RoleSelectorBar } from './components/RoleSelectorBar';
@@ -15,9 +15,10 @@ import { ComparisonSection } from './components/ComparisonSection';
 import { EditWeekModal } from './components/EditWeekModal';
 import { AddWeekModal } from './components/AddWeekModal';
 import { UploadWeekModal } from './components/UploadWeekModal';
+import { DateRangePickerModal } from './components/DateRangePickerModal';
 import { LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v10';
+const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v11';
 const AUTH_KEY = 'weekly_ops_dashboard_auth_v9';
 
 const EMPTY_WEEK: WeekData = {
@@ -100,6 +101,7 @@ export const App: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddWeekModalOpen, setIsAddWeekModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isDateRangeModalOpen, setIsDateRangeModalOpen] = useState(false);
 
   // Save weeks to localStorage whenever modified
   useEffect(() => {
@@ -111,7 +113,7 @@ export const App: React.FC = () => {
     setCurrentUserRole(role);
     setIsAuthenticated(true);
     localStorage.setItem(AUTH_KEY, role);
-    if (role === 'manager') {
+    if (role === 'manager' || role === 'sravani') {
       setActiveTab('dashboard');
     } else {
       setActiveTab('reports');
@@ -126,6 +128,32 @@ export const App: React.FC = () => {
 
   // Selected week dataset
   const currentWeek = weeks.find((w) => w.id === selectedWeekId) || weeks[0] || EMPTY_WEEK;
+
+  // Custom Date Range & Duration Handler (7, 10, 15, 30, or N Days)
+  const handleSelectCustomRange = (dateRangeStr: string, numDays: number) => {
+    const newWeekId = `range-${Date.now()}`;
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    const updatedTeamData = (currentWeek.teamData || []).map((tm) => {
+      const logs: DailyLogEntry[] = [];
+      for (let i = 0; i < numDays; i++) {
+        const dayLabel = i < 7 ? dayNames[i] : `Day ${i + 1}`;
+        logs.push({ day: dayLabel, campaigns: 0, hours: 0, notes: '' });
+      }
+      return { ...tm, dailyLogs: logs };
+    });
+
+    const newWeek: WeekData = {
+      ...currentWeek,
+      id: newWeekId,
+      dateRange: dateRangeStr,
+      previousWeekRange: currentWeek.dateRange,
+      teamData: updatedTeamData,
+    };
+
+    setWeeks((prev) => [newWeek, ...prev]);
+    setSelectedWeekId(newWeekId);
+  };
 
   // Calendar Date Filter Handler
   const handleSelectCalendarDate = (dateStr: string) => {
@@ -318,10 +346,12 @@ export const App: React.FC = () => {
     return <LoginPage onLogin={handleLogin} />;
   }
 
+  const isManagerOrLead = currentUserRole === 'manager' || currentUserRole === 'sravani';
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       
-      {/* Dropdown Role Simulator Bar */}
+      {/* Dropdown Role Simulator Bar (Only for Managers & Leads) */}
       <RoleSelectorBar
         currentRole={currentUserRole}
         onSelectRole={(role) => {
@@ -339,6 +369,7 @@ export const App: React.FC = () => {
           setTeamFilter('ALL');
         }}
         onSelectCalendarDate={handleSelectCalendarDate}
+        onOpenDateRangeModal={() => setIsDateRangeModalOpen(true)}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         currentUserRole={currentUserRole}
@@ -384,7 +415,7 @@ export const App: React.FC = () => {
         ) : (
           <>
             {/* ROLE VIEW 1: Individual Resource View (Sravani, Sricharan, Vamsi, etc.) */}
-            {currentUserRole !== 'manager' && (
+            {!isManagerOrLead && (
               <ResourceWeeklyReportForm
                 key={`${currentWeek.id}-${currentUserRole}`}
                 currentWeek={currentWeek}
@@ -396,8 +427,8 @@ export const App: React.FC = () => {
               />
             )}
 
-            {/* ROLE VIEW 2: Manager Overview (Alex) */}
-            {currentUserRole === 'manager' && (
+            {/* ROLE VIEW 2: Manager Overview (Alex / Sravani Lead) */}
+            {isManagerOrLead && (
               <>
                 {/* TAB 1: Dashboard */}
                 {activeTab === 'dashboard' && (
@@ -466,6 +497,14 @@ export const App: React.FC = () => {
           <p>© 2026 Operations Management Platform. Built for Ongage, Netcore, Maropost tracking.</p>
         </div>
       </footer>
+
+      {/* Custom Date Range & Duration Picker Modal */}
+      <DateRangePickerModal
+        isOpen={isDateRangeModalOpen}
+        onClose={() => setIsDateRangeModalOpen(false)}
+        currentDateRange={currentWeek.dateRange}
+        onSelectCustomRange={handleSelectCustomRange}
+      />
 
       {/* Edit Modal */}
       <EditWeekModal
