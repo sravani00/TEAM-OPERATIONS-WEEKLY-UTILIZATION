@@ -16,7 +16,7 @@ import { AddWeekModal } from './components/AddWeekModal';
 import { UploadWeekModal } from './components/UploadWeekModal';
 import { LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v6';
+const STORAGE_KEY = 'weekly_ops_dashboard_weeks_v7';
 
 const EMPTY_WEEK: WeekData = {
   id: 'empty-week',
@@ -29,8 +29,8 @@ const EMPTY_WEEK: WeekData = {
     prevTotalCampaigns: 0,
     totalHours: 0,
     prevTotalHours: 0,
-    totalTeamMembers: 0,
-    prevTotalTeamMembers: 0,
+    totalTeamMembers: 7,
+    prevTotalTeamMembers: 7,
     completedActivitiesCount: 0,
     prevCompletedActivitiesCount: 0,
   },
@@ -39,6 +39,26 @@ const EMPTY_WEEK: WeekData = {
   activities: [],
   planItems: [],
 };
+
+// Helper function to format Monday - Friday date range from any calendar date
+function getWeekRangeFromDate(dateInput: Date): { dateRange: string; weekId: string } {
+  const d = new Date(dateInput);
+  const day = d.getDay();
+  const diffToMon = d.getDate() - day + (day === 0 ? -6 : 1);
+  
+  const monday = new Date(d.setDate(diffToMon));
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const formatOpt: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+  const monStr = monday.toLocaleDateString('en-US', formatOpt);
+  const friStr = friday.toLocaleDateString('en-US', formatOpt);
+  const yearStr = friday.getFullYear();
+
+  const dateRange = `${monStr} – ${friStr}, ${yearStr}`;
+  const weekId = `week-${monday.toISOString().split('T')[0]}`;
+  return { dateRange, weekId };
+}
 
 export const App: React.FC = () => {
   // Persistence state
@@ -76,6 +96,33 @@ export const App: React.FC = () => {
 
   // Selected week dataset
   const currentWeek = weeks.find((w) => w.id === selectedWeekId) || weeks[0] || EMPTY_WEEK;
+
+  // Calendar Date Filter Handler
+  const handleSelectCalendarDate = (dateStr: string) => {
+    if (!dateStr) return;
+    const pickedDate = new Date(dateStr);
+    if (isNaN(pickedDate.getTime())) return;
+
+    const { dateRange, weekId } = getWeekRangeFromDate(pickedDate);
+
+    const existingWeek = weeks.find(
+      (w) => w.id === weekId || w.dateRange.toLowerCase() === dateRange.toLowerCase()
+    );
+
+    if (existingWeek) {
+      setSelectedWeekId(existingWeek.id);
+    } else {
+      // Create new week dataset for the selected calendar date range
+      const newWeek: WeekData = {
+        ...INITIAL_WEEKS[0],
+        id: weekId,
+        dateRange,
+        previousWeekRange: currentWeek.dateRange,
+      };
+      setWeeks((prev) => [newWeek, ...prev]);
+      setSelectedWeekId(newWeek.id);
+    }
+  };
 
   // Filtered Datasets
   const filteredEspData = currentWeek.espData.filter((esp) => {
@@ -121,7 +168,7 @@ export const App: React.FC = () => {
     const totalTeamMembers = teamData.length;
     const teamUtilization = totalTeamMembers > 0
       ? Math.round((teamData.reduce((acc, t) => acc + (Number(t.utilization) || 0), 0) / totalTeamMembers) * 10) / 10
-      : 96.2;
+      : 0;
     const completedActivitiesCount = (updatedWeek.activities || []).filter((a) => a.status === 'Completed').length;
 
     const recalculatedWeek: WeekData = {
@@ -261,6 +308,7 @@ export const App: React.FC = () => {
           setEspFilter('ALL');
           setTeamFilter('ALL');
         }}
+        onSelectCalendarDate={handleSelectCalendarDate}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenEditModal={() => setIsEditModalOpen(true)}

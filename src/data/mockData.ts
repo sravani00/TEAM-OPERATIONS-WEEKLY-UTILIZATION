@@ -1,4 +1,12 @@
-import type { WeekData } from '../types';
+import type { WeekData, DailyLogEntry } from '../types';
+
+const defaultDailyLogs: DailyLogEntry[] = [
+  { day: 'Monday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Tuesday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Wednesday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Thursday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Friday', campaigns: 0, hours: 0, notes: '' },
+];
 
 export const INITIAL_WEEKS: WeekData[] = [
   {
@@ -41,6 +49,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'sb-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'sb-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],
@@ -62,6 +71,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'scb-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'scb-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],
@@ -83,6 +93,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'vb-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'vb-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],
@@ -104,6 +115,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'vkb-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'vkb-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],
@@ -125,6 +137,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'db-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'db-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],
@@ -146,6 +159,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'visb-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'visb-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],
@@ -167,6 +181,7 @@ export const INITIAL_WEEKS: WeekData[] = [
           { id: 'rb-3', esp: 'Maropost', campaigns: 0, utilization: 0 },
           { id: 'rb-4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
         ],
+        dailyLogs: defaultDailyLogs,
         description: '',
         keyActivities: [],
         thisWeekPlan: [],

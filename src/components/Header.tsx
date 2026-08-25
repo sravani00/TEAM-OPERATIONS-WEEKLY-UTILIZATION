@@ -25,6 +25,7 @@ interface HeaderProps {
   weeks: WeekData[];
   selectedWeekId: string;
   onSelectWeek: (id: string) => void;
+  onSelectCalendarDate: (dateStr: string) => void;
   activeTab: DashboardTab;
   onSelectTab: (tab: DashboardTab) => void;
   onOpenEditModal: () => void;
@@ -40,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   weeks,
   selectedWeekId,
   onSelectWeek,
+  onSelectCalendarDate,
   activeTab,
   onSelectTab,
   onOpenEditModal,
@@ -79,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Resource utilization tracking, ESP campaign metrics & automated manager reports
+                Daily logging, resource utilization tracking & automated manager reports
               </p>
             </div>
           </div>
@@ -87,14 +89,28 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Controls & Actions */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             
-            {/* Week Selector Dropdown */}
+            {/* Calendar Date Picker Week Filter */}
             <div className="relative flex items-center">
               <Calendar className="w-4 h-4 text-cyan-600 absolute left-3 pointer-events-none z-10" />
+              <input
+                type="date"
+                title="Select a date on calendar to filter week"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    onSelectCalendarDate(e.target.value);
+                  }
+                }}
+                className="bg-slate-50 text-slate-900 font-bold pl-9 pr-3 py-2 rounded-xl text-xs border border-slate-300 hover:border-cyan-500 focus:outline-none cursor-pointer shadow-sm"
+              />
+            </div>
+
+            {/* Week Selector Dropdown */}
+            <div className="relative flex items-center">
               <select
                 value={selectedWeekId}
                 onChange={(e) => onSelectWeek(e.target.value)}
                 disabled={weeks.length === 0}
-                className="appearance-none bg-slate-50 text-slate-900 font-bold pl-9 pr-9 py-2 rounded-xl text-xs border border-slate-300 hover:border-cyan-500 focus:outline-none cursor-pointer shadow-sm disabled:opacity-50"
+                className="appearance-none bg-slate-50 text-slate-900 font-bold pl-4 pr-9 py-2 rounded-xl text-xs border border-slate-300 hover:border-cyan-500 focus:outline-none cursor-pointer shadow-sm disabled:opacity-50"
               >
                 {weeks.length === 0 ? (
                   <option value="">No Weeks Loaded</option>

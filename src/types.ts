@@ -18,6 +18,14 @@ export interface ESPData {
   previousWeekUtilization: number;
 }
 
+export interface DailyLogEntry {
+  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
+  dateStr?: string;
+  campaigns: number;
+  hours: number;
+  notes?: string;
+}
+
 export interface TeamMemberData {
   id: string;
   name: string;
@@ -30,6 +38,7 @@ export interface TeamMemberData {
   previousWeekUtilization: number;
   status: ReportStatus;
   espBreakdown: ESPBreakdownItem[];
+  dailyLogs?: DailyLogEntry[];
   description: string;
   keyActivities: string[];
   thisWeekPlan: string[];

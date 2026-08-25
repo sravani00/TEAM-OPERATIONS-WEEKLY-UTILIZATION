@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { WeekData, TeamMemberData, ESPBreakdownItem } from '../types';
+import type { WeekData, TeamMemberData, ESPBreakdownItem, DailyLogEntry } from '../types';
 import { 
   Send, 
   Save, 
@@ -12,7 +12,8 @@ import {
   Sparkles,
   Server,
   FileText,
-  ListTodo
+  ListTodo,
+  CalendarDays
 } from 'lucide-react';
 
 interface ResourceWeeklyReportFormProps {
@@ -22,6 +23,14 @@ interface ResourceWeeklyReportFormProps {
   onSelectWeek: (weekId: string) => void;
   allWeeks: WeekData[];
 }
+
+const defaultDailyTemplate: DailyLogEntry[] = [
+  { day: 'Monday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Tuesday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Wednesday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Thursday', campaigns: 0, hours: 0, notes: '' },
+  { day: 'Friday', campaigns: 0, hours: 0, notes: '' },
+];
 
 export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> = ({
   currentWeek,
@@ -50,6 +59,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
       { id: '3', esp: 'Maropost', campaigns: 0, utilization: 0 },
       { id: '4', esp: 'ValueFirst', campaigns: 0, utilization: 0 },
     ],
+    dailyLogs: defaultDailyTemplate,
     description: '',
     keyActivities: [],
     thisWeekPlan: [],
@@ -57,7 +67,9 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
 
   // Form State
   const [espBreakdown, setEspBreakdown] = useState<ESPBreakdownItem[]>(memberRecord.espBreakdown || []);
-  const [totalTime, setTotalTime] = useState<number>(memberRecord.hours || 31.5);
+  const [dailyLogs, setDailyLogs] = useState<DailyLogEntry[]>(
+    memberRecord.dailyLogs && memberRecord.dailyLogs.length > 0 ? memberRecord.dailyLogs : defaultDailyTemplate
+  );
   const [description, setDescription] = useState<string>(memberRecord.description || '');
   const [keyActivities, setKeyActivities] = useState<string[]>(memberRecord.keyActivities || []);
   const [thisWeekPlan, setThisWeekPlan] = useState<string[]>(memberRecord.thisWeekPlan || []);
@@ -67,12 +79,23 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
   const isLocked = memberRecord.status === 'Submitted' || memberRecord.status === 'Approved';
 
   // Derived & Auto-Calculated Metrics
-  const totalCampaigns = espBreakdown.reduce((acc, curr) => acc + (Number(curr.campaigns) || 0), 0);
+  const espTotalCampaigns = espBreakdown.reduce((acc, curr) => acc + (Number(curr.campaigns) || 0), 0);
+  const dailyTotalCampaigns = dailyLogs.reduce((acc, curr) => acc + (Number(curr.campaigns) || 0), 0);
+  const totalCampaigns = espTotalCampaigns > 0 ? espTotalCampaigns : dailyTotalCampaigns;
+
+  const totalTime = dailyLogs.reduce((acc, curr) => acc + (Number(curr.hours) || 0), 0);
   const avgHoursPerDay = Math.round((totalTime / 4) * 100) / 100;
   const dailyUtilization = Math.min(100, Math.round((totalTime / 32) * 1000) / 10);
   const overallUtilization = espBreakdown.length > 0
     ? Math.round((espBreakdown.reduce((acc, curr) => acc + (Number(curr.utilization) || 0), 0) / espBreakdown.length) * 10) / 10
-    : 95.5;
+    : dailyUtilization;
+
+  // Daily Logs Handler
+  const handleDailyLogChange = (day: string, field: 'campaigns' | 'hours' | 'notes', val: string | number) => {
+    setDailyLogs((prev) =>
+      prev.map((entry) => (entry.day === day ? { ...entry, [field]: val } : entry))
+    );
+  };
 
   // ESP Table Handlers
   const handleESPChange = (id: string, field: 'esp' | 'campaigns', val: string | number) => {
@@ -84,7 +107,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
   const handleAddESP = () => {
     setEspBreakdown((prev) => [
       ...prev,
-      { id: `esp-${Date.now()}`, esp: 'New ESP', campaigns: 20, utilization: 90.0 },
+      { id: `esp-${Date.now()}`, esp: 'New ESP', campaigns: 0, utilization: 0 },
     ]);
   };
 
@@ -127,6 +150,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
       dailyUtilization,
       status: targetStatus,
       espBreakdown,
+      dailyLogs,
       description,
       keyActivities,
       thisWeekPlan,
@@ -169,7 +193,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Update your weekly campaign numbers & hours. All derivative metrics are calculated automatically.
+            Log your daily metrics (Mon–Fri). Weekly totals and utilization rates calculate automatically in real time.
           </p>
         </div>
 
@@ -203,10 +227,110 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
         </div>
       )}
 
-      {/* Main Report Form Card */}
+      {/* Main Report Form Container */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-8">
         
-        {/* Section 1: ESP-wise Campaign Utilization */}
+        {/* Section 1: Daily Operations Logging Grid (Mon - Fri) */}
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm border-b border-slate-200 pb-2">
+            <CalendarDays className="w-4 h-4 text-purple-600" />
+            <h3>Daily Operations Logging (Monday – Friday)</h3>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                <tr>
+                  <th className="py-3 px-4">Day</th>
+                  <th className="py-3 px-4 text-right">Campaigns Completed</th>
+                  <th className="py-3 px-4 text-right">Hours Worked</th>
+                  <th className="py-3 px-4 text-right">Daily Util % (Auto)</th>
+                  <th className="py-3 px-4">Notes / Focus Area</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {dailyLogs.map((log) => {
+                  const dayUtil = log.hours > 0 ? Math.min(100, Math.round((log.hours / 8) * 100)) : 0;
+                  return (
+                    <tr key={log.day} className="hover:bg-slate-50/80">
+                      <td className="py-2.5 px-4 font-bold text-slate-900">{log.day}</td>
+                      
+                      {/* Daily Campaigns */}
+                      <td className="py-2.5 px-4 text-right">
+                        {isLocked ? (
+                          <span className="font-bold text-emerald-700">{log.campaigns}</span>
+                        ) : (
+                          <input
+                            type="number"
+                            min="0"
+                            value={log.campaigns}
+                            onChange={(e) => handleDailyLogChange(log.day, 'campaigns', parseFloat(e.target.value) || 0)}
+                            className="bg-slate-50 text-emerald-700 font-extrabold px-3 py-1.5 rounded-lg border border-slate-300 w-24 text-right focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-sm"
+                          />
+                        )}
+                      </td>
+
+                      {/* Daily Hours */}
+                      <td className="py-2.5 px-4 text-right">
+                        {isLocked ? (
+                          <span className="font-bold text-purple-700">{log.hours} hrs</span>
+                        ) : (
+                          <input
+                            type="number"
+                            step="0.5"
+                            min="0"
+                            value={log.hours}
+                            onChange={(e) => handleDailyLogChange(log.day, 'hours', parseFloat(e.target.value) || 0)}
+                            className="bg-slate-50 text-purple-700 font-extrabold px-3 py-1.5 rounded-lg border border-slate-300 w-24 text-right focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-sm"
+                          />
+                        )}
+                      </td>
+
+                      {/* Daily Util % */}
+                      <td className="py-2.5 px-4 text-right">
+                        <span className={`font-extrabold px-2.5 py-1 rounded-lg border text-xs ${
+                          dayUtil >= 90
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : dayUtil > 0
+                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            : 'bg-slate-100 text-slate-500 border-slate-200'
+                        }`}>
+                          {dayUtil}%
+                        </span>
+                      </td>
+
+                      {/* Notes */}
+                      <td className="py-2.5 px-4">
+                        {isLocked ? (
+                          <span className="text-slate-600 font-medium">{log.notes || '-'}</span>
+                        ) : (
+                          <input
+                            type="text"
+                            value={log.notes || ''}
+                            onChange={(e) => handleDailyLogChange(log.day, 'notes', e.target.value)}
+                            placeholder="Optional day notes..."
+                            className="w-full bg-slate-50 text-slate-800 font-medium px-3 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs shadow-sm"
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {/* Total Row */}
+                <tr className="bg-slate-100 font-black text-slate-900">
+                  <td className="py-3 px-4">Weekly Total (Mon–Fri)</td>
+                  <td className="py-3 px-4 text-right text-emerald-700 font-black text-sm">{dailyTotalCampaigns}</td>
+                  <td className="py-3 px-4 text-right text-purple-700 font-black text-sm">{totalTime} hrs</td>
+                  <td className="py-3 px-4 text-right text-blue-700 font-black text-sm">{dailyUtilization}%</td>
+                  <td className="py-3 px-4 text-slate-500 font-bold">Auto-Aggregated</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Section 2: ESP-wise Campaign Breakdown */}
         <div className="space-y-3">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm">
@@ -296,33 +420,24 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
           </div>
         </div>
 
-        {/* Section 2: Campaign & Daily Utilization Metrics */}
+        {/* Section 3: Metric Summary Cards */}
         <div className="space-y-3">
           <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm border-b border-slate-200 pb-2">
             <Clock className="w-4 h-4 text-purple-600" />
-            <h3>Campaign & Daily Utilization</h3>
+            <h3>Aggregated Operational Metrics</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
               <label className="text-[11px] text-slate-500 block font-bold">Campaigns Completed</label>
               <div className="text-2xl font-black text-emerald-700">{totalCampaigns}</div>
-              <p className="text-[10px] text-slate-400 font-medium">Auto-calculated from ESP table</p>
+              <p className="text-[10px] text-slate-400 font-medium">Auto-aggregated</p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
               <label className="text-[11px] text-slate-500 block font-bold">Total Time (Hours)</label>
-              {isLocked ? (
-                <div className="text-2xl font-black text-purple-700">{totalTime} hrs</div>
-              ) : (
-                <input
-                  type="number"
-                  step="0.5"
-                  value={totalTime}
-                  onChange={(e) => setTotalTime(parseFloat(e.target.value) || 0)}
-                  className="w-full bg-white text-purple-700 font-black text-xl px-3 py-1 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-sm"
-                />
-              )}
+              <div className="text-2xl font-black text-purple-700">{totalTime} hrs</div>
+              <p className="text-[10px] text-slate-400 font-medium">Auto-summed from Daily Log</p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
@@ -339,7 +454,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
           </div>
         </div>
 
-        {/* Section 3: Description */}
+        {/* Section 4: Description */}
         <div className="space-y-2">
           <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm border-b border-slate-200 pb-2">
             <FileText className="w-4 h-4 text-emerald-600" />
@@ -360,7 +475,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
           )}
         </div>
 
-        {/* Section 4: Key Activities Completed */}
+        {/* Section 5: Key Activities Completed */}
         <div className="space-y-3">
           <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm border-b border-slate-200 pb-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -409,7 +524,7 @@ export const ResourceWeeklyReportForm: React.FC<ResourceWeeklyReportFormProps> =
           )}
         </div>
 
-        {/* Section 5: This Week Plan */}
+        {/* Section 6: This Week Plan */}
         <div className="space-y-3">
           <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm border-b border-slate-200 pb-2">
             <ListTodo className="w-4 h-4 text-cyan-600" />
